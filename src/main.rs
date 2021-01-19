@@ -7,15 +7,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let stdout = io::stdout();
     let mut handle = io::BufWriter::new(stdout);
-    let matches = App::new("File content scanner")
-                          .version("1.0")
-                          .author("Kevin Y. <yunfan.yang.kevin@gmail.com>")
-                          .about("Display file content in command line interface")
-                          .args_from_usage(
+    let matches = App::new("fc")
+                        .version("1.0")
+                        .author("Kevin Y. <yunfan.yang.kevin@gmail.com>")
+                        .about("Display file content in command line interface")
+                        .args_from_usage(
                             "<INPUT>            'Sets the input file to use'
                             -t, --tail=[TAIL]   'Sets the tail number'
                             -h, --head=[HEAD]   'Sets the head number'")
-                          .get_matches();
+                        .get_matches();
 
     // Gets a value for config if supplied by user, or defaults to "default.conf"
     let input_file = matches.value_of("INPUT").unwrap();
