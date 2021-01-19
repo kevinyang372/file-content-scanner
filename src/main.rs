@@ -1,9 +1,12 @@
 extern crate clap;
 use clap::App;
 use std::collections::VecDeque;
+use std::io::{self, Write};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 
+    let stdout = io::stdout();
+    let mut handle = io::BufWriter::new(stdout);
     let matches = App::new("File content scanner")
                           .version("1.0")
                           .author("Kevin Y. <yunfan.yang.kevin@gmail.com>")
@@ -18,7 +21,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let input_file = matches.value_of("INPUT").unwrap();
     let tail_number = matches.value_of("tail").unwrap_or("0").parse::<usize>().unwrap();
     let head_number = matches.value_of("head").unwrap_or("0").parse::<usize>().unwrap();
-    println!("Input value: {} {} {}", input_file, tail_number, head_number);
 
     let content = std::fs::read_to_string(&input_file)?;
     let mut i = 1;
@@ -26,12 +28,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut tail_queue = VecDeque::new();
 
     if head_number > 0 {
-        println!("[HEAD]");
+        writeln!(handle, "[HEAD]")?;
     }
 
     for line in content.lines() {
         if i <= head_number || (head_number == 0 && tail_number == 0) {
-            println!("Line {}: {}", i, line);
+            writeln!(handle, "Line {}: {}", i, line)?;
         }
 
         if tail_number > 0 && tail_queue.len() == tail_number {
@@ -46,9 +48,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if tail_number > 0 {
-        println!("[TAIL]");
+        writeln!(handle, "[TAIL]")?;
         for line in tail_queue {
-            println!("Line {}: {}", i - tail_number, line);
+            writeln!(handle, "Line {}: {}", i - tail_number, line)?;
             i += 1;
         }
     }
