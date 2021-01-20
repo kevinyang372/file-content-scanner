@@ -2,9 +2,14 @@ extern crate clap;
 use clap::App;
 use std::collections::VecDeque;
 use std::io;
+use std::fs;
 
 
-fn scan_file(content: &str, mut handle: impl std::io::Write,head_number: &usize, tail_number: &usize) -> Result<(), Box<dyn std::error::Error>> {
+fn scan_file(input_file: &str, mut handle: impl std::io::Write,head_number: &usize, tail_number: &usize) -> Result<(), Box<dyn std::error::Error>> {
+
+    let content = fs::read_to_string(input_file)?;
+    writeln!(handle, "{}", input_file)?;
+
     let mut i = 1;
     let mut tail_queue = VecDeque::new();
 
@@ -39,6 +44,7 @@ fn scan_file(content: &str, mut handle: impl std::io::Write,head_number: &usize,
         }
     }
 
+    writeln!(handle, "\n")?;
     Ok(())
 }
 
@@ -62,7 +68,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let tail_number = matches.value_of("tail").unwrap_or("0").parse::<usize>().unwrap();
     let head_number = matches.value_of("head").unwrap_or("0").parse::<usize>().unwrap();
 
-    let content = std::fs::read_to_string(&input_file)?;
+    if input_file == "." {
+        for entry in fs::read_dir(".")? {
+            let entry = entry?;
+            let path = entry.path();
+            if !path.is_dir() {
+                scan_file(path.to_str().unwrap(), &mut handle, &head_number, &tail_number)?;
+            }
+        }
+        
+        return Ok(());
+    }
 
-    scan_file(&content, &mut handle, &head_number, &tail_number)
+    scan_file(&input_file, &mut handle, &head_number, &tail_number)
 }

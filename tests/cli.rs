@@ -44,3 +44,16 @@ fn test_file_with_head_tail() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+#[test]
+fn test_dot_with_head_tail() -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = NamedTempFile::new()?;
+    writeln!(file, "THIS IS LINE 1\nTHIS IS LINE 2\nTHIS IS LINE 3")?;
+    
+    let mut cmd = Command::cargo_bin("fc")?;
+    cmd.arg(".").arg("--head=2").arg("--tail=2");
+    cmd.assert()
+        .success();
+
+    Ok(())
+}
