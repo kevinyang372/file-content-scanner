@@ -9,6 +9,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let stdout = io::stdout();
     let handle = io::BufWriter::new(stdout);
+
+    // Define the list of valid arguments
     let matches = App::new("fc")
                         .version("1.0")
                         .author("Kevin Y. <yunfan.yang.kevin@gmail.com>")
@@ -19,6 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             -h, --head=[HEAD]   'Sets the head number'")
                         .get_matches();
     
+    // Parse user inputs into arguments and run the main logic
     let configs = parse_args(&matches);
     run(configs, handle)
 }
