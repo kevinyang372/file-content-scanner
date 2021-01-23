@@ -18,7 +18,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .args_from_usage(
                             "<INPUT>            'Sets the input file to use'
                             -t, --tail=[TAIL]   'Sets the tail number'
-                            -h, --head=[HEAD]   'Sets the head number'")
+                            -h, --head=[HEAD]   'Sets the head number'
+                            -l  --line=[RANGE]  'Use int_1..int_2 to set the line range (notice this arg is mutually exclusive with -t/-h)'
+                        ")
                         .get_matches();
     
     // Parse user inputs into arguments and run the main logic

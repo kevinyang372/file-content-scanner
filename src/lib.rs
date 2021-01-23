@@ -4,6 +4,7 @@
 //! and tail_number to selectively output information.
 
 use clap::ArgMatches;
+use regex::Regex;
 use std::fs;
 use std::collections::VecDeque;
 
@@ -14,13 +15,17 @@ pub struct Config<'a> {
     /// Number of lines to keep counting from head
     head_number: usize,
     /// Number of lines to keep counting from tail
-    tail_number: usize
+    tail_number: usize,
+    /// Start of the line range
+    line_range_start: usize,
+    /// End of the line range
+    line_range_end: usize
 }
 
 impl<'a> Config<'a> {
     /// Create a new argument list
-    fn new(input_file: &'a str, head_number: usize, tail_number: usize) -> Config<'a> {
-        Config { input_file, head_number, tail_number }
+    fn new(input_file: &'a str, head_number: usize, tail_number: usize, line_range_start: usize, line_range_end: usize) -> Config<'a> {
+        Config { input_file, head_number, tail_number, line_range_start, line_range_end }
     }
 }
 
@@ -47,11 +52,20 @@ pub fn run(config: Config, mut handle: impl std::io::Write) -> Result<(), Box<dy
 
 /// Parse arguments into configurations
 pub fn parse_args<'a>(matches: &'a ArgMatches) -> Config<'a> {
+    let re = Regex::new(r"^\d..\d$").unwrap();
+
     let input_file = matches.value_of("INPUT").unwrap();
     let tail_number = matches.value_of("tail").unwrap_or("0").parse::<usize>().unwrap();
     let head_number = matches.value_of("head").unwrap_or("0").parse::<usize>().unwrap();
+    let line_range = matches.value_of("line").unwrap_or("0..0");
 
-    Config::new(input_file, head_number, tail_number)
+    if re.is_match(line_range) {
+        let split = line_range.split("..");
+        let args: Vec<usize> = split.map(|x| x.parse::<usize>().unwrap()).collect();
+        return Config::new(input_file, head_number, tail_number, args[0], args[1]);
+    }
+    
+    Config::new(input_file, head_number, tail_number, 0, 0)
 }
 
 /// Scan and output the content of one individual file
